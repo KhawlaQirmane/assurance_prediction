@@ -14,6 +14,7 @@ app = Flask(__name__,template_folder='templates')
 def health():
     return jsonify({"status": "ok"})
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
