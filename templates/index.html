@@ -1,79 +1,84 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prédiction Assurance</title>
+    <title>Insurance Charge Prediction</title>
 </head>
 <body>
-    <h2>Entrez les informations pour prédire les charges d'assurance</h2>
+    <h1>Insurance Charge Prediction</h1>
     <form id="predictionForm">
-        <label for="age">Âge :</label>
-        <input type="number" id="age" name="age" required><br><br>
+        <label for="age">Age:</label><br>
+        <input type="text" id="age" name="age" required><br>
 
-        <label for="sex">Sexe :</label>
+        <label for="sex">Sex:</label><br>
         <select id="sex" name="sex" required>
-            <option value="male">male</option>
-            <option value="female">female</option>
-        </select><br><br>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select><br>
 
-        <label for="bmi">IMC :</label>
-        <input type="number" id="bmi" name="bmi" step="0.1" required><br><br>
+        <label for="bmi">BMI:</label><br>
+        <input type="text" id="bmi" name="bmi" required><br>
 
-        <label for="children">Nombre d'enfants :</label>
-        <input type="number" id="children" name="children" required><br><br>
+        <label for="children">Children:</label><br>
+        <input type="text" id="children" name="children" required><br>
 
-        <label for="smoker">Fumeur :</label>
+        <label for="smoker">Smoker:</label><br>
         <select id="smoker" name="smoker" required>
-            <option value="yes">yes</option>
-            <option value="no">no</option>
-        </select><br><br>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select><br>
 
-        <label for="region">Région :</label>
+        <label for="region">Region:</label><br>
         <select id="region" name="region" required>
-            <option value="southeast">Southeast</option>
             <option value="southwest">Southwest</option>
+            <option value="southeast">Southeast</option>
             <option value="northwest">Northwest</option>
             <option value="northeast">Northeast</option>
         </select><br><br>
 
-        <button type="button" onclick="sendPrediction()">Obtenir la prédiction</button>
+        <input type="submit" value="Predict">
     </form>
 
-    <h3 id="result"></h3>
+    <h2>Prediction Result</h2>
+    <p id="result"></p>
 
     <script>
-        async function sendPrediction() {
-            const data = {
-                age: parseFloat(document.getElementById('age').value),
+        const form = document.querySelector("#predictionForm");
+    
+        form.addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            // Create an object with the form data
+            const formData = {
+                age: document.getElementById('age').value,
                 sex: document.getElementById('sex').value,
-                bmi: parseFloat(document.getElementById('bmi').value),
-                children: parseInt(document.getElementById('children').value),
+                bmi: document.getElementById('bmi').value,
+                children: document.getElementById('children').value,
                 smoker: document.getElementById('smoker').value,
                 region: document.getElementById('region').value
             };
-
-            try {
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    document.getElementById('result').innerText = "Prédiction des charges : " + result.resultats.prediction;
+    
+            // Send the data as JSON to the server
+            fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction) {
+                    document.getElementById("result").textContent = "Predicted Charges: $" + data.prediction.toFixed(2);
                 } else {
-                    document.getElementById('result').innerText = "Erreur : " + result.erreur;
+                    document.getElementById("result").textContent = "Error: " + data.error;
                 }
-            } catch (error) {
-                console.error("Erreur lors de la prédiction :", error);
-                document.getElementById('result').innerText = "Erreur lors de la prédiction.";
-            }
-        }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById("result").textContent = "Error occurred while predicting.";
+            });
+        });
     </script>
-</body>
-</html>
+    

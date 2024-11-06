@@ -1,72 +1,67 @@
-from pydantic import BaseModel, Field  # Used for data validation
-import numpy as np
-import pandas as pd  # Used for data manipulation
-import joblib  # Used for loading the saved model
 from flask import Flask, request, jsonify, render_template
+import joblib
+import pandas as pd
 
-# Load the trained model
+# Load the trained model and scaler
 model = joblib.load('ELN_model.pkl')
-
-# List of columns used in the model training
-model_columns = ['age', 'bmi', 'children', 'sex_male', 'smoker_yes', 
-                 'region_northwest', 'region_southeast', 'region_southwest'] 
-
-class DonneesEntree(BaseModel):
-    age: float  
-    sex: str  
-    bmi: float  
-    children: int  
-    smoker: str
-    region: str = Field(..., description="Must be one of: southeast, southwest, northwest, northeast")
+scaler = joblib.load('scaler.pkl')
 
 # Create the Flask app
-app = Flask(__name__)
+app = Flask(__name__,template_folder='templates')
 
 # Endpoint for checking the health of the API
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({"status": "ok"})
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 # Endpoint for prediction
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == 'GET':
-        # Render the HTML form when the user accesses the page
-        return render_template('index.html')
+    try:
+        data = request.get_json()
+        # Extract input data from the form
+        age = float(data['age'])
+        sex = data['sex']
+        bmi = float(data['bmi'])
+        children = int(data['children'])
+        smoker = data['smoker']
+        region = data['region']
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400  # Return error message if any exception occurs
+
+    # Prepare the input data for prediction (same structure as during training)
+    input_data = pd.DataFrame([[age, sex, bmi, children, smoker, region]], columns=['age', 'sex', 'bmi', 'children', 'smoker', 'region'])
+
+    # One-hot encode categorical columns
+    input_data_encoded = pd.get_dummies(input_data, columns=['sex', 'smoker', 'region'], drop_first=True)
+
+    # Ensure the input data has the same columns as the model expects
+    expected_columns = ['smoker_yes', 'sex_male', 'region_northwest', 'region_southeast', 'region_southwest', 'age', 'bmi', 'children']
     
-    if request.method == 'POST':
-        if not request.json:
-            return jsonify({"erreur": "Aucun JSON fourni"}), 400
-        
-        try:
-            # Extraction et validation des données d'entrée
-            donnees = DonneesEntree(**request.json)
-            donnees_df = pd.DataFrame([donnees.dict()])  # Convertit en DataFrame
+    # Reindex the DataFrame to match the model's expected columns, filling missing columns with 0
+    input_data_encoded = input_data_encoded.reindex(columns=expected_columns, fill_value=0)
 
-            # One-hot encode les colonnes catégorielles (sex, smoker, region)
-            donnees_df = pd.get_dummies(donnees_df, columns=['sex', 'smoker', 'region'], drop_first=True)
+    # Separate binary and non-binary data (same as done in your training model)
+    binary_data = input_data_encoded[["smoker_yes", "sex_male", "region_northwest", "region_southeast", "region_southwest"]]
+    non_binary_data = input_data_encoded.drop(columns=["smoker_yes", "sex_male", "region_northwest", "region_southeast", "region_southwest"])
 
-            # Ajoute les colonnes manquantes avec des valeurs de zéro
-            for col in model_columns:
-                if col not in donnees_df.columns:
-                    donnees_df[col] = 0
+    # Scale non-binary data using the trained scaler
+    non_binary_scaled = scaler.transform(non_binary_data)
+    non_binary_scaled_df = pd.DataFrame(non_binary_scaled, columns=non_binary_data.columns)
 
-            # Réordonne les colonnes pour correspondre à l'ordre d'entraînement
-            donnees_df = donnees_df[model_columns]
+    # Concatenate scaled non-binary data with binary data
+    final_input_data = pd.concat([non_binary_scaled_df, binary_data], axis=1)
 
-            # Utilisation du modèle pour prédire les charges
-            predictions = model.predict(donnees_df)
+    # Make prediction
+    prediction = model.predict(final_input_data)
+    prediction_result = prediction[0]  # Get the prediction (first value)
 
-            # Compilation des résultats dans un dictionnaire
-            resultats = donnees.dict()
-            resultats['prediction'] = float(predictions[0])  # Cast to float for consistency
-
-            # Renvoie les résultats sous forme de JSON
-            return jsonify({"resultats": resultats})
-
-        except Exception as e:
-            # Gestion des erreurs et renvoi d'une réponse d'erreur
-            return jsonify({"erreur": str(e)}), 400
+    # Return the prediction as a JSON response
+    return jsonify({'prediction': prediction_result})
 
 # Start the Flask server
 if __name__ == '__main__':
