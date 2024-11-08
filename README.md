@@ -53,7 +53,8 @@ To run this project locally, follow the steps below:
      ```bash
      source .venv/bin/activate
      ```
-   for windows:
+   for windows: 
+   
      ```bash
     .venv\Scripts\activate
      ```
