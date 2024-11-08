@@ -18,7 +18,7 @@ This project is a machine learning-based **Insurance Price Prediction** web appl
 
 - **REST API**: A backend API built with Flask to handle prediction requests.
 - **Machine Learning Models**: Trained using Lasso, OLS, ElasticNet, and Ridge regression methods to predict insurance charges.
-- **Interactive Frontend**: A simple, interactive interface where users can enter input values for BMI, age, gender, children, and smoking status.
+- **Interactive Frontend**: A simple, interactive interface(A form filled in by the user). where users can enter input values for BMI, age, gender, children, and smoking status.
 - **Dockerized App**: Docker is used for easy packaging, deployment, and scaling of the application.
 - **Prediction Rendering**: Once the user submits the input values, the application provides an estimated insurance price.
 
