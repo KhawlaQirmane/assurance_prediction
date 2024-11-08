@@ -18,9 +18,9 @@ This project is a machine learning-based **Insurance Price Prediction** web appl
 
 - **REST API**: A backend API built with Flask to handle prediction requests.
 - **Machine Learning Models**: Trained using Lasso, OLS, ElasticNet, and Ridge regression methods to predict insurance charges.
-- **Interactive Frontend**: A simple, interactive interface(A form filled in by the user). where users can enter input values for BMI, age, gender, children, and smoking status.
+- **Interactive Frontend**: A simple, interactive interface(A form filled in by the user). where users can enter input values for BMI, age, gender, children, and 
+    smoking status and the application provides an estimated insurance price.
 - **Dockerized App**: Docker is used for easy packaging, deployment, and scaling of the application.
-- **Prediction Rendering**: Once the user submits the input values, the application provides an estimated insurance price.
 
 ## Technologies Used
 
@@ -39,7 +39,36 @@ This project is a machine learning-based **Insurance Price Prediction** web appl
 
 To run this project locally, follow the steps below:
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/username/insurance-prediction.git
+## Setup
 
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/yourusername/insurance-prediction-app.git
+    cd insurance-prediction-app
+    ```
+2.Create avirtual envirement: 
+   for Linux/macOS:
+     source .venv/bin/activate
+   for windows:
+    .venv\Scripts\activate
+3. Install the dependencies:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Run the Flask API:
+
+    ```bash
+    python app.py
+    ```
+
+5. Docker (optional):
+
+    Build and run the Docker container:
+
+    ```bash
+    docker build -t insurance-prediction-app .
+    docker run -p 5000:5000 insurance-prediction-app
+    ```
