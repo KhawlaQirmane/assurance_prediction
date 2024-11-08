@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template
 import joblib
 import pandas as pd
+import numpy as np
 
 # Load the trained model and scaler
 model = joblib.load('model.pkl')
@@ -57,7 +58,7 @@ def predict():
     final_input_data = pd.concat([non_binary_scaled_df, binary_data], axis=1)
 
     # Make prediction
-    prediction = model.predict(final_input_data)
+    prediction = np.exp(model.predict(final_input_data))
     prediction_result = prediction[0]  # Get the first prediction result
 
     # Return the prediction as a JSON response

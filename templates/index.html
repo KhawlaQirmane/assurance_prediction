@@ -4,51 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Insurance Charge Prediction</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        /* Custom Medical Insurance Theme */
+        body {
+            background-color: #f4f8fa;
+            font-family: 'Arial', sans-serif;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #005f6b;
+            margin-bottom: 30px;
+        }
+        .form-container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container label {
+            font-weight: bold;
+            color: #005f6b;
+        }
+        .form-container input, .form-container select {
+            border-radius: 5px;
+        }
+        .btn-predict {
+            background-color: #00bfae;
+            color: white;
+        }
+        .btn-predict:hover {
+            background-color: #007f6d;
+        }
+        .result-container {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.5em;
+            color: #005f6b;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        .footer a {
+            color: #00bfae;
+        }
+    </style>
 </head>
 <body>
-    <h1>Insurance Charge Prediction</h1>
-    <form id="predictionForm">
-        <label for="age">Age:</label><br>
-        <input type="text" id="age" name="age" required><br>
 
-        <label for="sex">Sex:</label><br>
-        <select id="sex" name="sex" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-        </select><br>
+    <div class="container form-container">
+        <h1>Insurance Charge Prediction</h1>
+        <form id="predictionForm">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="age">Age:</label>
+                    <input type="number" class="form-control" id="age" name="age" required>
+                </div>
 
-        <label for="bmi">BMI:</label><br>
-        <input type="text" id="bmi" name="bmi" required><br>
+                <div class="form-group col-md-6">
+                    <label for="sex">Sex:</label>
+                    <select id="sex" class="form-control" name="sex" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
 
-        <label for="children">Children:</label><br>
-        <input type="text" id="children" name="children" required><br>
+                <div class="form-group col-md-6">
+                    <label for="bmi">BMI:</label>
+                    <input type="number" class="form-control" id="bmi" name="bmi" required>
+                </div>
 
-        <label for="smoker">Smoker:</label><br>
-        <select id="smoker" name="smoker" required>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-        </select><br>
+                <div class="form-group col-md-6">
+                    <label for="children">Children:</label>
+                    <input type="number" class="form-control" id="children" name="children" required>
+                </div>
 
-        <label for="region">Region:</label><br>
-        <select id="region" name="region" required>
-            <option value="southwest">Southwest</option>
-            <option value="southeast">Southeast</option>
-            <option value="northwest">Northwest</option>
-            <option value="northeast">Northeast</option>
-        </select><br><br>
+                <div class="form-group col-md-6">
+                    <label for="smoker">Smoker:</label>
+                    <select id="smoker" class="form-control" name="smoker" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
 
-        <input type="submit" value="Predict">
-    </form>
+                <div class="form-group col-md-6">
+                    <label for="region">Region:</label>
+                    <select id="region" class="form-control" name="region" required>
+                        <option value="southwest">Southwest</option>
+                        <option value="southeast">Southeast</option>
+                        <option value="northwest">Northwest</option>
+                        <option value="northeast">Northeast</option>
+                    </select>
+                </div>
+            </div>
 
-    <h2>Prediction Result</h2>
-    <p id="result"></p>
+            <div class="text-center">
+                <input type="submit" class="btn btn-predict btn-lg" value="Predict">
+            </div>
+        </form>
+    </div>
+
+    <div class="result-container">
+        <h2>Prediction Result</h2>
+        <p id="result" style="font-size: 2em;"></p>
+    </div>
+
+    <div class="footer">
+        <p>Powered by <a href="#">Medical Insurance Inc.</a></p>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <script>
         const form = document.querySelector("#predictionForm");
-    
+
         form.addEventListener("submit", function(e) {
             e.preventDefault();
-            
+
             const formData = {
                 age: document.getElementById('age').value,
                 sex: document.getElementById('sex').value,
