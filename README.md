@@ -49,13 +49,14 @@ To run this project locally, follow the steps below:
     ```
 2.Create avirtual envirement: 
    for Linux/macOS:
+   
      ```bash
-      source .venv/bin/activate
-       ```
+     source .venv/bin/activate
+     ```
    for windows:
-    ```bash
+     ```bash
     .venv\Scripts\activate
-    ```
+     ```
 3. Install the dependencies:
 
     ```bash
